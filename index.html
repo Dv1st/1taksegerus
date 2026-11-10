@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Карточки: Части речи и средства связи</title>
+    <title>Полный справочник: Части речи и средства связи</title>
     <style>
         :root {
             --primary-color: #4a90e2;
@@ -35,6 +35,7 @@
         h1 {
             color: var(--secondary-color);
             margin-bottom: 15px;
+            font-size: 1.8rem;
         }
 
         /* Панель фильтров */
@@ -55,6 +56,7 @@
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s ease;
+            font-size: 0.95rem;
         }
 
         .filter-btn:hover, .filter-btn.active {
@@ -62,7 +64,7 @@
             color: white;
         }
 
-        /* Кнопка случайного режима (выделена) */
+        /* Кнопка случайного режима */
         .filter-btn.random-btn {
             border-color: #e67e22;
             color: #e67e22;
@@ -73,28 +75,28 @@
             color: white;
         }
 
-        /* Сетка карточек (обычный режим) */
+        /* Сетка карточек */
         .cards-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
             max-width: 1200px;
             margin: 0 auto;
         }
 
-        /* --- Стили для режима случайной карточки --- */
+        /* --- Режим случайной карточки --- */
         .random-mode-container {
-            display: none; /* Скрыто по умолчанию */
+            display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             margin: 40px auto;
-            max-width: 400px;
+            max-width: 450px;
         }
 
         .random-mode-container .card {
             width: 100%;
-            height: 300px; /* Сделаем карточку чуть больше в случайном режиме */
+            height: 350px;
         }
 
         .next-card-btn {
@@ -123,7 +125,7 @@
         /* --- Общие стили карточки --- */
         .card {
             background-color: transparent;
-            height: 220px;
+            height: 260px; /* Увеличили высоту, так как текста стало больше */
             perspective: 1000px;
             cursor: pointer;
         }
@@ -170,13 +172,15 @@
             transform: rotateY(180deg);
             border: 2px solid var(--secondary-color);
             font-size: 0.95rem;
-            line-height: 1.4;
+            line-height: 1.5;
+            text-align: left; /* Текст на обороте лучше читается слева */
         }
 
         .card-title {
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             font-weight: bold;
             margin-bottom: 10px;
+            text-align: center;
         }
 
         .card-hint {
@@ -184,27 +188,20 @@
             color: #888;
             position: absolute;
             bottom: 15px;
+            width: 100%;
+            text-align: center;
         }
 
         .card-back strong {
             color: var(--primary-color);
-            display: block;
-            margin-bottom: 5px;
         }
         
-        .card-back::-webkit-scrollbar {
-            width: 6px;
-        }
-        .card-back::-webkit-scrollbar-thumb {
-            background-color: #ccc;
-            border-radius: 3px;
-        }
+        /* Скроллбар для обратной стороны */
+        .card-back::-webkit-scrollbar { width: 6px; }
+        .card-back::-webkit-scrollbar-thumb { background-color: #ccc; border-radius: 3px; }
         
-        /* Анимация появления случайной карточки */
-        .fade-in {
-            animation: fadeIn 0.4s ease-in-out;
-        }
-        
+        /* Анимация появления */
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
         @keyframes fadeIn {
             from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
@@ -215,58 +212,90 @@
 
     <header>
         <h1>Средства связи и части речи</h1>
-        <p>Выберите категорию и режим просмотра</p>
+        <p>Полный справочник по вашим таблицам</p>
     </header>
 
     <div class="filters" id="filters">
-        <button class="filter-btn active" data-filter="all">Все</button>
+        <button class="filter-btn active" data-filter="all">Все карточки</button>
         <button class="filter-btn" data-filter="Союзы">Союзы</button>
         <button class="filter-btn" data-filter="Предлоги">Предлоги</button>
         <button class="filter-btn" data-filter="Вводные слова">Вводные слова</button>
         <button class="filter-btn" data-filter="Частицы">Частицы</button>
         <button class="filter-btn" data-filter="Местоимения">Местоимения</button>
         <button class="filter-btn" data-filter="Наречия">Наречия</button>
-        
-        <!-- Новая кнопка -->
-        <button class="filter-btn random-btn" id="toggle-random">🎲 Случайные карточки</button>
+        <button class="filter-btn random-btn" id="toggle-random">🎲 Случайная карточка</button>
     </div>
 
-    <!-- Контейнер для сетки (обычный режим) -->
     <div class="cards-container" id="cards-container"></div>
 
-    <!-- Контейнер для случайной карточки -->
     <div class="random-mode-container" id="random-container">
-        <div class="card" id="single-random-card">
-            <!-- Содержимое будет вставлено через JS -->
-        </div>
+        <div class="card" id="single-random-card"></div>
         <button class="next-card-btn" id="next-btn">Следующая карточка ➔</button>
     </div>
 
     <script>
+        // ПОЛНЫЙ МАССИВ ДАННЫХ ИЗ ВСЕХ 4-Х ФОТО
         const cardsData = [
+            // ================= СОЮЗЫ =================
             { category: "Союзы", title: "Сочинительные: Соединительные", content: "<strong>Слова:</strong> И, ДА (=И), НИ...НИ, ТОЖЕ, ТАКЖЕ<br><br><strong>Пример:</strong> Хлынули потоки дождя, <i>и</i> запрыгал град." },
             { category: "Союзы", title: "Сочинительные: Противительные", content: "<strong>Слова:</strong> А, НО, ДА (=НО), ОДНАКО, ЗАТО, ЖЕ<br><br><strong>Пример:</strong> Можно было ехать, <i>однако</i> началась гроза." },
             { category: "Союзы", title: "Сочинительные: Разделительные", content: "<strong>Слова:</strong> ИЛИ, ЛИБО, ТО...ТО, НЕ ТО... НЕ ТО<br><br><strong>Пример:</strong> <i>То</i> моросил дождь, <i>то</i> начинал идти снег." },
-            { category: "Союзы", title: "Подчинительные: Временные", content: "<strong>Слова:</strong> КОГДА, КАК ТОЛЬКО, ЛИШЬ, ЕДВА, ПОКА, ПРЕЖДЕ ЧЕМ...<br><br><strong>Пример:</strong> Уже вечерело, <i>когда</i> он вернулся." },
-            { category: "Союзы", title: "Подчинительные: Причинные", content: "<strong>Слова:</strong> ТАК КАК, ПОТОМУ ЧТО, ИБО, ПОСКОЛЬКУ, ВЕДЬ...<br><br><strong>Пример:</strong> Стало светло, <i>потому что</i> взошла луна." },
-            
+            { category: "Союзы", title: "Сочинительные: Пояснительные", content: "<strong>Слова:</strong> ТО ЕСТЬ, А ИМЕННО<br><br><strong>Пример:</strong> Я вернусь через два дня, <i>то есть</i> в воскресенье." },
+            { category: "Союзы", title: "Сочинительные: Присоединительные", content: "<strong>Слова:</strong> ДА И, А ТАКЖЕ, ПРИТОМ<br><br><strong>Пример:</strong> Она умна, <i>притом</i> красива." },
+            { category: "Союзы", title: "Двойные союзы", content: "<strong>Слова:</strong> КАК... ТАК И, ХОТЯ И... НО, НЕ ТОЛЬКО... НО И, НЕ СТОЛЬКО... СКОЛЬКО, ЕСЛИ НЕ... ТО<br><br><strong>Пример:</strong> День был <i>хотя и</i> пасмурный, <i>но</i> тёплый." },
+            { category: "Союзы", title: "Подчинительные: Временные", content: "<strong>Слова:</strong> КОГДА, КАК ТОЛЬКО, ЛИШЬ, ЛИШЬ ТОЛЬКО, ЕДВА, ПОКА, ПРЕЖДЕ ЧЕМ, ТОГДА КАК, ПОСЛЕ ТОГО КАК, С ТЕХ ПОР КАК...<br><br><strong>Пример:</strong> Уже вечерело, <i>когда</i> он вернулся." },
+            { category: "Союзы", title: "Подчинительные: Изъяснительные", content: "<strong>Слова:</strong> ЧТО, ЧТОБЫ, КАК...<br><br><strong>Пример:</strong> Хочу, <i>чтобы</i> ты вернулся." },
+            { category: "Союзы", title: "Подчинительные: Причинные", content: "<strong>Слова:</strong> ТАК КАК, ПОТОМУ ЧТО, ИБО, ПОСКОЛЬКУ, ВЕДЬ, ВСЛЕДСТВИЕ ТОГО ЧТО...<br><br><strong>Пример:</strong> Стало светло, <i>потому что</i> взошла луна." },
+            { category: "Союзы", title: "Подчинительные: Следствия", content: "<strong>Слова:</strong> ТАК ЧТО, ВСЛЕДСТВИЕ ЧЕГО...<br><br><strong>Пример:</strong> Потеплело, <i>так что</i> снег начал таять." },
+            { category: "Союзы", title: "Подчинительные: Сравнительные", content: "<strong>Слова:</strong> КАК, СЛОВНО, БУДТО, ТОЧНО, КАК БУДТО...<br><br><strong>Пример:</strong> Послышался высокий звук, <i>словно</i> кто-то пел." },
+            { category: "Союзы", title: "Подчинительные: Уступительные", content: "<strong>Слова:</strong> ХОТЯ, НЕСМОТРЯ НА ТО ЧТО, ПУСТЬ, ПУСКАЙ...<br><br><strong>Пример:</strong> <i>Хотя</i> стемнело, никто и не думал расходиться." },
+            { category: "Союзы", title: "Подчинительные: Условные", content: "<strong>Слова:</strong> ЕСЛИ, КОЛИ, КАБЫ, РАЗ...<br><br><strong>Пример:</strong> <i>Если</i> дождь не прекратится, в город не поедем." },
+            { category: "Союзы", title: "Подчинительные: Целевые", content: "<strong>Слова:</strong> ЧТОБЫ, ДЛЯ ТОГО ЧТОБЫ...<br><br><strong>Пример:</strong> Я пришёл, <i>чтобы</i> поговорить." },
+
+            // ================= ПРЕДЛОГИ =================
             { category: "Предлоги", title: "Непроизводные предлоги", content: "<strong>Слова:</strong> В, НА, ЗА, ПО, ПОД, НАД, О, БЕЗ, ДЛЯ, ДО, С, У, К, ОТ, ИЗ, ЧЕРЕЗ, ПРО, ПЕРЕД, ИЗ-ЗА, ИЗ-ПОД." },
-            { category: "Предлоги", title: "Производные предлоги (наречные)", content: "<strong>Слова:</strong> ОКОЛО, МИМО, НАВСТРЕЧУ, ВОКРУГ, ВДОЛЬ, ПОСЛЕ, НАПРОТИВ, ВБЛИЗИ, ВМЕСТО, СВЕРХ, НАПОДОБИЕ." },
-            { category: "Предлоги", title: "Производные предлоги (отыменные)", content: "<strong>Слова:</strong> В СИЛУ, В ТЕЧЕНИЕ, В ПРОДОЛЖЕНИЕ, ВСЛЕДСТВИЕ, В СВЯЗИ С, ЗА СЧЕТ, ПО ПРИЧИНЕ, НАСЧЕТ." },
+            { category: "Предлоги", title: "Производные (наречные)", content: "<strong>Слова:</strong> ОКОЛО, МИМО, НАВСТРЕЧУ, ВОКРУГ, ВДОЛЬ, ПОСЛЕ, НАПРОТИВ, ВБЛИЗИ, ВМЕСТО, СВЕРХ, НАПОДОБИЕ." },
+            { category: "Предлоги", title: "Производные (отыменные)", content: "<strong>Слова:</strong> В СИЛУ, В ТЕЧЕНИЕ, В ПРОДОЛЖЕНИЕ, ВСЛЕДСТВИЕ, В СВЯЗИ С, ЗА СЧЕТ, ПО ПРИЧИНЕ, НАСЧЕТ." },
 
-            { category: "Вводные слова", title: "Вводные: Уверенность", content: "<strong>Слова:</strong> КОНЕЧНО, РАЗУМЕЕТСЯ, БЕЗУСЛОВНО, БЕССПОРНО, БЕССТОРНО, СПОРНО.<br><br><i>(Выражают большую степень уверенности)</i>" },
-            { category: "Вводные слова", title: "Вводные: Порядок мыслей", content: "<strong>Слова:</strong> ВО-ПЕРВЫХ, ВО-ВТОРЫХ, НАКОНЕЦ, СЛЕДОВАТЕЛЬНО, ИТАК, ЗНАЧИТ, НАПРОТИВ.<br><br><i>(Связь мыслей, последовательность)</i>" },
+            // ================= ВВОДНЫЕ СЛОВА =================
+            { category: "Вводные слова", title: "Вводные: Большая уверенность", content: "<strong>Слова:</strong> БЕЗУСЛОВНО, БЕЗ СОМНЕНИЯ, НЕСОМНЕННО, БЕССПОРНО, КОНЕЧНО, РАЗУМЕЕТСЯ." },
+            { category: "Вводные слова", title: "Вводные: Сомнение / достоверность", content: "<strong>Слова:</strong> ВЕРОЯТНО, НАВЕРНОЕ, ВИДИМО, ВОЗМОЖНО, ДОЛЖНО БЫТЬ, КАЖЕТСЯ, МОЖЕТ БЫТЬ, ПО-ВИДИМОМУ, ОЧЕВИДНО." },
+            { category: "Вводные слова", title: "Вводные: Порядок мыслей", content: "<strong>Слова:</strong> ВО-ПЕРВЫХ, ВО-ВТОРЫХ, ПРЕЖДЕ ВСЕГО, НАКОНЕЦ, НАПРОТИВ, НАОБОРОТ, С ОДНОЙ СТОРОНЫ, С ДРУГОЙ СТОРОНЫ." },
+            { category: "Вводные слова", title: "Вводные: Следствие, вывод", content: "<strong>Слова:</strong> ЗНАЧИТ, ИТАК, СЛЕДОВАТЕЛЬНО, ИНЫМИ СЛОВАМИ, ИНАЧЕ ГОВОРЯ." },
+            { category: "Вводные слова", title: "Вводные: Ссылка на примеры", content: "<strong>Слова:</strong> НАПРИМЕР, В ЧАСТНОСТИ, К ПРИМЕРУ, ТАКИМ ОБРАЗОМ, В КОНЦЕ КОНЦОВ." },
+            { category: "Вводные слова", title: "Вводные: Обобщение", content: "<strong>Слова:</strong> СЛОВОМ, ОДНИМ СЛОВОМ, ИНЫМИ СЛОВАМИ, ДРУГИМИ СЛОВАМИ, ИТОГОВ, ВЫВОД." },
 
-            { category: "Частицы", title: "Частицы: Указательные", content: "<strong>Слова:</strong> ВОТ, ВОН, ЭТО<br><br><i>Выражают дополнительные смысловые оттенки</i>" },
+            // ================= ЧАСТИЦЫ =================
+            { category: "Частицы", title: "Частицы: Указательные", content: "<strong>Слова:</strong> ВОТ, ВОН, ЭТО" },
             { category: "Частицы", title: "Частицы: Уточняющие", content: "<strong>Слова:</strong> ИМЕННО, КАК РАЗ, ТОЛЬКО, ЛИШЬ, ЕДИНСТВЕННО, ИСКЛЮЧИТЕЛЬНО" },
+            { category: "Частицы", title: "Частицы: Ограничительные", content: "<strong>Слова:</strong> ТОЛЬКО, ЛИШЬ" },
             { category: "Частицы", title: "Частицы: Усилительные", content: "<strong>Слова:</strong> ДАЖЕ, ЖЕ, ВЕДЬ, ВСЁ, ВСЁ-ТАКИ, УЖ" },
+            { category: "Частицы", title: "Частицы: Выражающие сомнение", content: "<strong>Слова:</strong> ВРЯД ЛИ, ЕДВА ЛИ" },
 
-            { category: "Местоимения", title: "Разряды: Личные и возвратное", content: "<strong>Личные:</strong> Я, МЫ, ТЫ, ВЫ, ОН, ОНА, ОНО, ОНИ<br><br><strong>Возвратное:</strong> СЕБЯ" },
+            // ================= МЕСТОИМЕНИЯ =================
+            { category: "Местоимения", title: "Разряды: Личные", content: "<strong>Слова:</strong> Я, МЫ, ТЫ, ВЫ, ОН, ОНА, ОНО, ОНИ" },
+            { category: "Местоимения", title: "Разряды: Возвратное", content: "<strong>Слова:</strong> СЕБЯ" },
             { category: "Местоимения", title: "Разряды: Притяжательные", content: "<strong>Слова:</strong> МОЙ, НАШ, ТВОЙ, ВАШ, ЕГО, ЕЁ, ИХ, СВОЙ" },
-            { category: "Местоимения", title: "Разряды: Вопросительные", content: "<strong>Слова:</strong> КТО? ЧТО? КАКОЙ? ЧЕЙ? СКОЛЬКО? КОТОРЫЙ?" },
+            { category: "Местоимения", title: "Разряды: Указательные", content: "<strong>Слова:</strong> ТОТ, ЭТОТ, ТАКОЙ, ТАКОВ, ТА, ТЕ, ЭТИ..." },
+            { category: "Местоимения", title: "Разряды: Вопросительные (с.сл.)", content: "<strong>Слова:</strong> КТО, ЧТО, КАКОЙ, ЧЕЙ, СКОЛЬКО, КОТОРЫЙ" },
+            { category: "Местоимения", title: "Разряды: Относительные", content: "<strong>Слова:</strong> КТО, ЧТО, КАКОЙ, ЧЕЙ, СКОЛЬКО, КОТОРЫЙ<br><br><i>(Те же слова, что и вопросительные, но служат для связи частей сложного предложения)</i>" },
+            { category: "Местоимения", title: "Разряды: Неопределенные", content: "<strong>Слова:</strong> НЕКТО, КАКОЙ-ТО, ЧЕЙ-ЛИБО, ЧТО-НИБУДЬ..." },
+            { category: "Местоимения", title: "Разряды: Отрицательные", content: "<strong>Слова:</strong> НИКТО, НИЧТО, НИКАКОЙ, НЕКОГО, НЕЧЕГО, НИСКОЛЬКО..." },
+            { category: "Местоимения", title: "Разряды: Определительные", content: "<strong>Слова:</strong> ВЕСЬ, ВСЯКИЙ, САМ, САМЫЙ, КАЖДЫЙ, ИНОЙ, ЛЮБОЙ, ДРУГОЙ" },
 
-            { category: "Наречия", title: "Наречия: Порядок, время", content: "<strong>Слова:</strong> СНАЧАЛА, ДАЛЕЕ, ПОТОМ, ЗДЕСЬ, ТАМ, ТУТ, ТУДА, ОТТУДА, ТОГДА, ЗАТЕМ." },
-            { category: "Наречия", title: "Местоименные наречия", content: "<strong>Указательные:</strong> ЗДЕСЬ, ТАМ, ТУТ, ТУДА, ТАК, ОТТУДА.<br><br><strong>Вопросительные:</strong> ГДЕ? КУДА? КОГДА? ОТКУДА? ПОЧЕМУ? ЗАЧЕМ? КАК?" }
+            // ================= НАРЕЧИЯ =================
+            { category: "Наречия", title: "Наречия: Порядок, время", content: "<strong>Слова:</strong> СНАЧАЛА, ДАЛЕЕ, ПОТОМ..." },
+            { category: "Наречия", title: "Наречия: Ссылка на примеры", content: "<strong>Слова:</strong> НЕСЛУЧАЙНО" },
+            { category: "Наречия", title: "Наречия: Следствие, вывод", content: "<strong>Слова:</strong> ПОЭТОМУ" },
+            { category: "Наречия", title: "Наречия: Степени", content: "<strong>Слова:</strong> ПОЧТИ, ПРИМЕРНО, НАСТОЛЬКО, СТОЛЬ" },
+            { category: "Наречия", title: "Наречия: Указательные", content: "<strong>Слова:</strong> ТАМ, ТУТ, ЗДЕСЬ, ТАК" },
+            { category: "Наречия", title: "Наречия: Относительные (союзные слова)", content: "<strong>Слова:</strong> ГДЕ, КУДА, КОГДА, ОТКУДА, ПОЧЕМУ, ЗАЧЕМ, КАК" },
+            { category: "Наречия", title: "Местоименные наречия: Указательные", content: "<strong>Слова:</strong> ЗДЕСЬ, ТАМ, ТУТ, ТУДА, ТАК, ОТТУДА, ПОЭТОМУ" },
+            { category: "Наречия", title: "Местоименные наречия: Вопросительные", content: "<strong>Слова:</strong> ГДЕ? КУДА? КОГДА? ОТКУДА? ПОЧЕМУ? ЗАЧЕМ? КАК? ОТЧЕГО?" },
+            { category: "Наречия", title: "Местоименные наречия: Относительные", content: "<strong>Слова:</strong> ГДЕ, КУДА, КОГДА, ОТКУДА, ПОЧЕМУ, ЗАЧЕМ, КАК, ОТЧЕГО" },
+            { category: "Наречия", title: "Местоименные наречия: Неопределенные", content: "<strong>Слова:</strong> ГДЕ-ТО, КУДА-ТО, КАК-НИБУДЬ, КОЕ-ГДЕ, КУДА-ЛИБО, КОЕ-КАК..." },
+            { category: "Наречия", title: "Местоименные наречия: Отрицательные", content: "<strong>Слова:</strong> НИГДЕ, НИКУДА, НИКОГДА, НЕГДЕ, НЕКУДА, НЕЗАЧЕМ, НИКАК..." },
+            { category: "Наречия", title: "Местоименные наречия: Определительные", content: "<strong>Слова:</strong> ВЕЗДЕ, ВСЮДУ, ОТОВСЮДУ, ВСЕГДА, ВСЯЧЕСКИ, ИНОГДА..." }
         ];
 
         const container = document.getElementById('cards-container');
@@ -279,14 +308,12 @@
         let currentFilter = 'all';
         let isRandomMode = false;
 
-        // Получить массив карточек по текущему фильтру
         function getFilteredCards() {
             return currentFilter === 'all' 
                 ? cardsData 
                 : cardsData.filter(card => card.category === currentFilter);
         }
 
-        // Отрисовка сетки
         function renderGrid() {
             container.innerHTML = '';
             const filteredData = getFilteredCards();
@@ -314,16 +341,13 @@
             });
         }
 
-        // Отрисовка одной случайной карточки
         function renderRandomCard() {
             const filteredData = getFilteredCards();
             if (filteredData.length === 0) return;
 
-            // Выбираем случайный индекс
             const randomIndex = Math.floor(Math.random() * filteredData.length);
             const cardData = filteredData[randomIndex];
 
-            // Сбрасываем переворот и обновляем содержимое
             randomCardDiv.className = 'card fade-in';
             randomCardDiv.innerHTML = `
                 <div class="card-inner">
@@ -337,17 +361,14 @@
                 </div>
             `;
 
-            // Добавляем клик для переворота
             randomCardDiv.onclick = function() {
                 this.classList.toggle('is-flipped');
             };
             
-            // Перезапуск анимации появления
             void randomCardDiv.offsetWidth;
             randomCardDiv.classList.add('fade-in');
         }
 
-        // Обработчики кнопок фильтрации (Категории)
         filterBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 filterBtns.forEach(b => b.classList.remove('active'));
@@ -356,40 +377,36 @@
                 currentFilter = e.target.dataset.filter;
                 
                 if (isRandomMode) {
-                    renderRandomCard(); // Если в случайном режиме - сразу меняем карточку
+                    renderRandomCard(); 
                 } else {
-                    renderGrid(); // Если в обычном - перерисовываем сетку
+                    renderGrid(); 
                 }
             });
         });
 
-        // Обработчик кнопки "Случайные карточки"
         toggleRandomBtn.addEventListener('click', () => {
             isRandomMode = !isRandomMode;
 
             if (isRandomMode) {
-                // Включаем случайный режим
                 toggleRandomBtn.classList.add('active');
                 toggleRandomBtn.textContent = "📚 Вернуться к сетке";
                 container.style.display = 'none';
                 randomContainer.style.display = 'flex';
                 renderRandomCard();
             } else {
-                // Выключаем случайный режим
                 toggleRandomBtn.classList.remove('active');
-                toggleRandomBtn.textContent = "🎲 Случайные карточки";
+                toggleRandomBtn.textContent = "🎲 Случайная карточка";
                 container.style.display = 'grid';
                 randomContainer.style.display = 'none';
                 renderGrid();
             }
         });
 
-        // Обработчик кнопки "Следующая карточка"
         nextBtn.addEventListener('click', () => {
             renderRandomCard();
         });
 
-        // Инициализация (запуск сетки при загрузке)
+        // Запуск при загрузке
         renderGrid();
     </script>
 </body>
