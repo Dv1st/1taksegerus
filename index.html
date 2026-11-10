@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Карточки: Части речи и средства связи</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #2c3e50;
+            --bg-color: #f5f7fa;
+            --card-front-bg: #ffffff;
+            --card-back-bg: #e8f0fe;
+            --text-color: #333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        /* Панель фильтров */
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid var(--primary-color);
+            background-color: transparent;
+            color: var(--primary-color);
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Кнопка случайного режима (выделена) */
+        .filter-btn.random-btn {
+            border-color: #e67e22;
+            color: #e67e22;
+        }
+        
+        .filter-btn.random-btn:hover, .filter-btn.random-btn.active {
+            background-color: #e67e22;
+            color: white;
+        }
+
+        /* Сетка карточек (обычный режим) */
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* --- Стили для режима случайной карточки --- */
+        .random-mode-container {
+            display: none; /* Скрыто по умолчанию */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 40px auto;
+            max-width: 400px;
+        }
+
+        .random-mode-container .card {
+            width: 100%;
+            height: 300px; /* Сделаем карточку чуть больше в случайном режиме */
+        }
+
+        .next-card-btn {
+            margin-top: 25px;
+            padding: 12px 30px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(46, 204, 113, 0.3);
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .next-card-btn:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+        }
+        
+        .next-card-btn:active {
+            transform: translateY(0);
+        }
+
+        /* --- Общие стили карточки --- */
+        .card {
+            background-color: transparent;
+            height: 220px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 12px;
+        }
+
+        .card.is-flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+        }
+
+        .card-front {
+            background-color: var(--card-front-bg);
+            border: 2px solid var(--primary-color);
+            color: var(--secondary-color);
+        }
+
+        .card-back {
+            background-color: var(--card-back-bg);
+            color: var(--text-color);
+            transform: rotateY(180deg);
+            border: 2px solid var(--secondary-color);
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .card-hint {
+            font-size: 0.8rem;
+            color: #888;
+            position: absolute;
+            bottom: 15px;
+        }
+
+        .card-back strong {
+            color: var(--primary-color);
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .card-back::-webkit-scrollbar {
+            width: 6px;
+        }
+        .card-back::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 3px;
+        }
+        
+        /* Анимация появления случайной карточки */
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Средства связи и части речи</h1>
+        <p>Выберите категорию и режим просмотра</p>
+    </header>
+
+    <div class="filters" id="filters">
+        <button class="filter-btn active" data-filter="all">Все</button>
+        <button class="filter-btn" data-filter="Союзы">Союзы</button>
+        <button class="filter-btn" data-filter="Предлоги">Предлоги</button>
+        <button class="filter-btn" data-filter="Вводные слова">Вводные слова</button>
+        <button class="filter-btn" data-filter="Частицы">Частицы</button>
+        <button class="filter-btn" data-filter="Местоимения">Местоимения</button>
+        <button class="filter-btn" data-filter="Наречия">Наречия</button>
+        
+        <!-- Новая кнопка -->
+        <button class="filter-btn random-btn" id="toggle-random">🎲 Случайные карточки</button>
+    </div>
+
+    <!-- Контейнер для сетки (обычный режим) -->
+    <div class="cards-container" id="cards-container"></div>
+
+    <!-- Контейнер для случайной карточки -->
+    <div class="random-mode-container" id="random-container">
+        <div class="card" id="single-random-card">
+            <!-- Содержимое будет вставлено через JS -->
+        </div>
+        <button class="next-card-btn" id="next-btn">Следующая карточка ➔</button>
+    </div>
+
+    <script>
+        const cardsData = [
+            { category: "Союзы", title: "Сочинительные: Соединительные", content: "<strong>Слова:</strong> И, ДА (=И), НИ...НИ, ТОЖЕ, ТАКЖЕ<br><br><strong>Пример:</strong> Хлынули потоки дождя, <i>и</i> запрыгал град." },
+            { category: "Союзы", title: "Сочинительные: Противительные", content: "<strong>Слова:</strong> А, НО, ДА (=НО), ОДНАКО, ЗАТО, ЖЕ<br><br><strong>Пример:</strong> Можно было ехать, <i>однако</i> началась гроза." },
+            { category: "Союзы", title: "Сочинительные: Разделительные", content: "<strong>Слова:</strong> ИЛИ, ЛИБО, ТО...ТО, НЕ ТО... НЕ ТО<br><br><strong>Пример:</strong> <i>То</i> моросил дождь, <i>то</i> начинал идти снег." },
+            { category: "Союзы", title: "Подчинительные: Временные", content: "<strong>Слова:</strong> КОГДА, КАК ТОЛЬКО, ЛИШЬ, ЕДВА, ПОКА, ПРЕЖДЕ ЧЕМ...<br><br><strong>Пример:</strong> Уже вечерело, <i>когда</i> он вернулся." },
+            { category: "Союзы", title: "Подчинительные: Причинные", content: "<strong>Слова:</strong> ТАК КАК, ПОТОМУ ЧТО, ИБО, ПОСКОЛЬКУ, ВЕДЬ...<br><br><strong>Пример:</strong> Стало светло, <i>потому что</i> взошла луна." },
+            
+            { category: "Предлоги", title: "Непроизводные предлоги", content: "<strong>Слова:</strong> В, НА, ЗА, ПО, ПОД, НАД, О, БЕЗ, ДЛЯ, ДО, С, У, К, ОТ, ИЗ, ЧЕРЕЗ, ПРО, ПЕРЕД, ИЗ-ЗА, ИЗ-ПОД." },
+            { category: "Предлоги", title: "Производные предлоги (наречные)", content: "<strong>Слова:</strong> ОКОЛО, МИМО, НАВСТРЕЧУ, ВОКРУГ, ВДОЛЬ, ПОСЛЕ, НАПРОТИВ, ВБЛИЗИ, ВМЕСТО, СВЕРХ, НАПОДОБИЕ." },
+            { category: "Предлоги", title: "Производные предлоги (отыменные)", content: "<strong>Слова:</strong> В СИЛУ, В ТЕЧЕНИЕ, В ПРОДОЛЖЕНИЕ, ВСЛЕДСТВИЕ, В СВЯЗИ С, ЗА СЧЕТ, ПО ПРИЧИНЕ, НАСЧЕТ." },
+
+            { category: "Вводные слова", title: "Вводные: Уверенность", content: "<strong>Слова:</strong> КОНЕЧНО, РАЗУМЕЕТСЯ, БЕЗУСЛОВНО, БЕССПОРНО, БЕССТОРНО, СПОРНО.<br><br><i>(Выражают большую степень уверенности)</i>" },
+            { category: "Вводные слова", title: "Вводные: Порядок мыслей", content: "<strong>Слова:</strong> ВО-ПЕРВЫХ, ВО-ВТОРЫХ, НАКОНЕЦ, СЛЕДОВАТЕЛЬНО, ИТАК, ЗНАЧИТ, НАПРОТИВ.<br><br><i>(Связь мыслей, последовательность)</i>" },
+
+            { category: "Частицы", title: "Частицы: Указательные", content: "<strong>Слова:</strong> ВОТ, ВОН, ЭТО<br><br><i>Выражают дополнительные смысловые оттенки</i>" },
+            { category: "Частицы", title: "Частицы: Уточняющие", content: "<strong>Слова:</strong> ИМЕННО, КАК РАЗ, ТОЛЬКО, ЛИШЬ, ЕДИНСТВЕННО, ИСКЛЮЧИТЕЛЬНО" },
+            { category: "Частицы", title: "Частицы: Усилительные", content: "<strong>Слова:</strong> ДАЖЕ, ЖЕ, ВЕДЬ, ВСЁ, ВСЁ-ТАКИ, УЖ" },
+
+            { category: "Местоимения", title: "Разряды: Личные и возвратное", content: "<strong>Личные:</strong> Я, МЫ, ТЫ, ВЫ, ОН, ОНА, ОНО, ОНИ<br><br><strong>Возвратное:</strong> СЕБЯ" },
+            { category: "Местоимения", title: "Разряды: Притяжательные", content: "<strong>Слова:</strong> МОЙ, НАШ, ТВОЙ, ВАШ, ЕГО, ЕЁ, ИХ, СВОЙ" },
+            { category: "Местоимения", title: "Разряды: Вопросительные", content: "<strong>Слова:</strong> КТО? ЧТО? КАКОЙ? ЧЕЙ? СКОЛЬКО? КОТОРЫЙ?" },
+
+            { category: "Наречия", title: "Наречия: Порядок, время", content: "<strong>Слова:</strong> СНАЧАЛА, ДАЛЕЕ, ПОТОМ, ЗДЕСЬ, ТАМ, ТУТ, ТУДА, ОТТУДА, ТОГДА, ЗАТЕМ." },
+            { category: "Наречия", title: "Местоименные наречия", content: "<strong>Указательные:</strong> ЗДЕСЬ, ТАМ, ТУТ, ТУДА, ТАК, ОТТУДА.<br><br><strong>Вопросительные:</strong> ГДЕ? КУДА? КОГДА? ОТКУДА? ПОЧЕМУ? ЗАЧЕМ? КАК?" }
+        ];
+
+        const container = document.getElementById('cards-container');
+        const randomContainer = document.getElementById('random-container');
+        const randomCardDiv = document.getElementById('single-random-card');
+        const nextBtn = document.getElementById('next-btn');
+        const toggleRandomBtn = document.getElementById('toggle-random');
+        const filterBtns = document.querySelectorAll('.filter-btn:not(.random-btn)');
+
+        let currentFilter = 'all';
+        let isRandomMode = false;
+
+        // Получить массив карточек по текущему фильтру
+        function getFilteredCards() {
+            return currentFilter === 'all' 
+                ? cardsData 
+                : cardsData.filter(card => card.category === currentFilter);
+        }
+
+        // Отрисовка сетки
+        function renderGrid() {
+            container.innerHTML = '';
+            const filteredData = getFilteredCards();
+
+            filteredData.forEach(card => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'card';
+                cardElement.innerHTML = `
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="card-title">${card.title}</div>
+                            <div class="card-hint">Нажмите, чтобы перевернуть</div>
+                        </div>
+                        <div class="card-back">
+                            <div>${card.content}</div>
+                        </div>
+                    </div>
+                `;
+                
+                cardElement.addEventListener('click', () => {
+                    cardElement.classList.toggle('is-flipped');
+                });
+
+                container.appendChild(cardElement);
+            });
+        }
+
+        // Отрисовка одной случайной карточки
+        function renderRandomCard() {
+            const filteredData = getFilteredCards();
+            if (filteredData.length === 0) return;
+
+            // Выбираем случайный индекс
+            const randomIndex = Math.floor(Math.random() * filteredData.length);
+            const cardData = filteredData[randomIndex];
+
+            // Сбрасываем переворот и обновляем содержимое
+            randomCardDiv.className = 'card fade-in';
+            randomCardDiv.innerHTML = `
+                <div class="card-inner">
+                    <div class="card-front">
+                        <div class="card-title">${cardData.title}</div>
+                        <div class="card-hint">Нажмите, чтобы перевернуть</div>
+                    </div>
+                    <div class="card-back">
+                        <div>${cardData.content}</div>
+                    </div>
+                </div>
+            `;
+
+            // Добавляем клик для переворота
+            randomCardDiv.onclick = function() {
+                this.classList.toggle('is-flipped');
+            };
+            
+            // Перезапуск анимации появления
+            void randomCardDiv.offsetWidth;
+            randomCardDiv.classList.add('fade-in');
+        }
+
+        // Обработчики кнопок фильтрации (Категории)
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                currentFilter = e.target.dataset.filter;
+                
+                if (isRandomMode) {
+                    renderRandomCard(); // Если в случайном режиме - сразу меняем карточку
+                } else {
+                    renderGrid(); // Если в обычном - перерисовываем сетку
+                }
+            });
+        });
+
+        // Обработчик кнопки "Случайные карточки"
+        toggleRandomBtn.addEventListener('click', () => {
+            isRandomMode = !isRandomMode;
+
+            if (isRandomMode) {
+                // Включаем случайный режим
+                toggleRandomBtn.classList.add('active');
+                toggleRandomBtn.textContent = "📚 Вернуться к сетке";
+                container.style.display = 'none';
+                randomContainer.style.display = 'flex';
+                renderRandomCard();
+            } else {
+                // Выключаем случайный режим
+                toggleRandomBtn.classList.remove('active');
+                toggleRandomBtn.textContent = "🎲 Случайные карточки";
+                container.style.display = 'grid';
+                randomContainer.style.display = 'none';
+                renderGrid();
+            }
+        });
+
+        // Обработчик кнопки "Следующая карточка"
+        nextBtn.addEventListener('click', () => {
+            renderRandomCard();
+        });
+
+        // Инициализация (запуск сетки при загрузке)
+        renderGrid();
+    </script>
+</body>
+</html>
