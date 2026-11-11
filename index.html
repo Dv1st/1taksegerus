@@ -3,15 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Полный справочник: Части речи и средства связи</title>
+    <title>Справочник: Части речи и средства связи</title>
     <style>
+        /* --- СВЕТЛАЯ ТЕМА (По умолчанию) --- */
         :root {
+            --bg-color: #f5f7fa;
+            --text-color: #333;
             --primary-color: #4a90e2;
             --secondary-color: #2c3e50;
-            --bg-color: #f5f7fa;
             --card-front-bg: #ffffff;
             --card-back-bg: #e8f0fe;
-            --text-color: #333;
+            --card-front-border: #4a90e2;
+            --card-back-border: #2c3e50;
+            --hint-color: #888;
+            --btn-bg: transparent;
+            --btn-text: #4a90e2;
+            --btn-active-bg: #4a90e2;
+            --btn-active-text: #ffffff;
+            --random-btn: #e67e22;
+            --next-btn: #2ecc71;
+            --next-btn-hover: #27ae60;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+            --badge-text: #ffffff;
+        }
+
+        /* --- ТЁМНАЯ ТЕМА --- */
+        [data-theme="dark"] {
+            --bg-color: #1a202c;
+            --text-color: #e2e8f0;
+            --primary-color: #63b3ed;
+            --secondary-color: #a0aec0;
+            --card-front-bg: #2d3748;
+            --card-back-bg: #1a202c;
+            --card-front-border: #4a5568;
+            --card-back-border: #4a5568;
+            --hint-color: #a0aec0;
+            --btn-bg: transparent;
+            --btn-text: #63b3ed;
+            --btn-active-bg: #63b3ed;
+            --btn-active-text: #1a202c;
+            --shadow: 0 4px 8px rgba(0,0,0,0.4);
         }
 
         * {
@@ -19,6 +50,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         body {
@@ -30,12 +62,33 @@
         header {
             text-align: center;
             margin-bottom: 30px;
+            position: relative;
         }
 
         h1 {
             color: var(--secondary-color);
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             font-size: 1.8rem;
+        }
+
+        /* Кнопка смены темы */
+        .theme-toggle {
+            position: absolute;
+            top: 0;
+            right: 20px;
+            background-color: var(--card-front-bg);
+            border: 2px solid var(--primary-color);
+            color: var(--text-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
         }
 
         /* Панель фильтров */
@@ -50,8 +103,8 @@
         .filter-btn {
             padding: 10px 20px;
             border: 2px solid var(--primary-color);
-            background-color: transparent;
-            color: var(--primary-color);
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
             border-radius: 20px;
             cursor: pointer;
             font-weight: 600;
@@ -60,18 +113,18 @@
         }
 
         .filter-btn:hover, .filter-btn.active {
-            background-color: var(--primary-color);
-            color: white;
+            background-color: var(--btn-active-bg);
+            color: var(--btn-active-text);
         }
 
         /* Кнопка случайного режима */
         .filter-btn.random-btn {
-            border-color: #e67e22;
-            color: #e67e22;
+            border-color: var(--random-btn);
+            color: var(--random-btn);
         }
         
         .filter-btn.random-btn:hover, .filter-btn.random-btn.active {
-            background-color: #e67e22;
+            background-color: var(--random-btn);
             color: white;
         }
 
@@ -102,7 +155,7 @@
         .next-card-btn {
             margin-top: 25px;
             padding: 12px 30px;
-            background-color: #2ecc71;
+            background-color: var(--next-btn);
             color: white;
             border: none;
             border-radius: 30px;
@@ -114,7 +167,7 @@
         }
 
         .next-card-btn:hover {
-            background-color: #27ae60;
+            background-color: var(--next-btn-hover);
             transform: translateY(-2px);
         }
         
@@ -125,7 +178,7 @@
         /* --- Общие стили карточки --- */
         .card {
             background-color: transparent;
-            height: 260px; /* Увеличили высоту, так как текста стало больше */
+            height: 260px;
             perspective: 1000px;
             cursor: pointer;
         }
@@ -137,7 +190,7 @@
             text-align: center;
             transition: transform 0.6s;
             transform-style: preserve-3d;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
             border-radius: 12px;
         }
 
@@ -152,7 +205,7 @@
             -webkit-backface-visibility: hidden;
             backface-visibility: hidden;
             border-radius: 12px;
-            padding: 20px;
+            padding: 25px 20px 20px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -162,30 +215,48 @@
 
         .card-front {
             background-color: var(--card-front-bg);
-            border: 2px solid var(--primary-color);
-            color: var(--secondary-color);
+            border: 2px solid var(--card-front-border);
+            color: var(--text-color);
         }
 
         .card-back {
             background-color: var(--card-back-bg);
             color: var(--text-color);
             transform: rotateY(180deg);
-            border: 2px solid var(--secondary-color);
+            border: 2px solid var(--card-back-border);
             font-size: 0.95rem;
             line-height: 1.5;
-            text-align: left; /* Текст на обороте лучше читается слева */
+            text-align: left;
+        }
+
+        /* Бейдж категории (Части речи) */
+        .card-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background-color: var(--primary-color);
+            color: var(--badge-text);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         .card-title {
-            font-size: 1.25rem;
+            font-size: 1.15rem;
             font-weight: bold;
+            margin-top: 15px;
             margin-bottom: 10px;
             text-align: center;
+            color: var(--secondary-color);
         }
 
         .card-hint {
             font-size: 0.8rem;
-            color: #888;
+            color: var(--hint-color);
             position: absolute;
             bottom: 15px;
             width: 100%;
@@ -196,9 +267,9 @@
             color: var(--primary-color);
         }
         
-        /* Скроллбар для обратной стороны */
+        /* Скроллбар */
         .card-back::-webkit-scrollbar { width: 6px; }
-        .card-back::-webkit-scrollbar-thumb { background-color: #ccc; border-radius: 3px; }
+        .card-back::-webkit-scrollbar-thumb { background-color: var(--hint-color); border-radius: 3px; }
         
         /* Анимация появления */
         .fade-in { animation: fadeIn 0.4s ease-in-out; }
@@ -206,13 +277,18 @@
             from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
         }
+
+        @media (max-width: 600px) {
+            .theme-toggle { position: static; margin-top: 15px; display: inline-block; }
+        }
     </style>
 </head>
 <body>
 
     <header>
         <h1>Средства связи и части речи</h1>
-        <p>Полный справочник по вашим таблицам</p>
+        <p>Полный справочник</p>
+        <button class="theme-toggle" id="theme-toggle" title="Сменить тему">🌙</button>
     </header>
 
     <div class="filters" id="filters">
@@ -223,7 +299,7 @@
         <button class="filter-btn" data-filter="Частицы">Частицы</button>
         <button class="filter-btn" data-filter="Местоимения">Местоимения</button>
         <button class="filter-btn" data-filter="Наречия">Наречия</button>
-        <button class="filter-btn random-btn" id="toggle-random">🎲 Случайная карточка</button>
+        <button class="filter-btn random-btn" id="toggle-random">🎲 Случайная</button>
     </div>
 
     <div class="cards-container" id="cards-container"></div>
@@ -258,46 +334,67 @@
             { category: "Предлоги", title: "Производные (отыменные)", content: "<strong>Слова:</strong> В СИЛУ, В ТЕЧЕНИЕ, В ПРОДОЛЖЕНИЕ, ВСЛЕДСТВИЕ, В СВЯЗИ С, ЗА СЧЕТ, ПО ПРИЧИНЕ, НАСЧЕТ." },
 
             // ================= ВВОДНЫЕ СЛОВА =================
-            { category: "Вводные слова", title: "Вводные: Большая уверенность", content: "<strong>Слова:</strong> БЕЗУСЛОВНО, БЕЗ СОМНЕНИЯ, НЕСОМНЕННО, БЕССПОРНО, КОНЕЧНО, РАЗУМЕЕТСЯ." },
-            { category: "Вводные слова", title: "Вводные: Сомнение / достоверность", content: "<strong>Слова:</strong> ВЕРОЯТНО, НАВЕРНОЕ, ВИДИМО, ВОЗМОЖНО, ДОЛЖНО БЫТЬ, КАЖЕТСЯ, МОЖЕТ БЫТЬ, ПО-ВИДИМОМУ, ОЧЕВИДНО." },
-            { category: "Вводные слова", title: "Вводные: Порядок мыслей", content: "<strong>Слова:</strong> ВО-ПЕРВЫХ, ВО-ВТОРЫХ, ПРЕЖДЕ ВСЕГО, НАКОНЕЦ, НАПРОТИВ, НАОБОРОТ, С ОДНОЙ СТОРОНЫ, С ДРУГОЙ СТОРОНЫ." },
-            { category: "Вводные слова", title: "Вводные: Следствие, вывод", content: "<strong>Слова:</strong> ЗНАЧИТ, ИТАК, СЛЕДОВАТЕЛЬНО, ИНЫМИ СЛОВАМИ, ИНАЧЕ ГОВОРЯ." },
-            { category: "Вводные слова", title: "Вводные: Ссылка на примеры", content: "<strong>Слова:</strong> НАПРИМЕР, В ЧАСТНОСТИ, К ПРИМЕРУ, ТАКИМ ОБРАЗОМ, В КОНЦЕ КОНЦОВ." },
-            { category: "Вводные слова", title: "Вводные: Обобщение", content: "<strong>Слова:</strong> СЛОВОМ, ОДНИМ СЛОВОМ, ИНЫМИ СЛОВАМИ, ДРУГИМИ СЛОВАМИ, ИТОГОВ, ВЫВОД." },
+            { category: "Вводные слова", title: "Большая уверенность", content: "<strong>Слова:</strong> БЕЗУСЛОВНО, БЕЗ СОМНЕНИЯ, НЕСОМНЕННО, БЕССПОРНО, КОНЕЧНО, РАЗУМЕЕТСЯ." },
+            { category: "Вводные слова", title: "Сомнение / достоверность", content: "<strong>Слова:</strong> ВЕРОЯТНО, НАВЕРНОЕ, ВИДИМО, ВОЗМОЖНО, ДОЛЖНО БЫТЬ, КАЖЕТСЯ, МОЖЕТ БЫТЬ, ПО-ВИДИМОМУ, ОЧЕВИДНО." },
+            { category: "Вводные слова", title: "Порядок мыслей", content: "<strong>Слова:</strong> ВО-ПЕРВЫХ, ВО-ВТОРЫХ, ПРЕЖДЕ ВСЕГО, НАКОНЕЦ, НАПРОТИВ, НАОБОРОТ, С ОДНОЙ СТОРОНЫ, С ДРУГОЙ СТОРОНЫ." },
+            { category: "Вводные слова", title: "Следствие, вывод", content: "<strong>Слова:</strong> ЗНАЧИТ, ИТАК, СЛЕДОВАТЕЛЬНО, ИНЫМИ СЛОВАМИ, ИНАЧЕ ГОВОРЯ." },
+            { category: "Вводные слова", title: "Ссылка на примеры", content: "<strong>Слова:</strong> НАПРИМЕР, В ЧАСТНОСТИ, К ПРИМЕРУ, ТАКИМ ОБРАЗОМ, В КОНЦЕ КОНЦОВ." },
+            { category: "Вводные слова", title: "Обобщение, вывод", content: "<strong>Слова:</strong> СЛОВОМ, ОДНИМ СЛОВОМ, ИНЫМИ СЛОВАМИ, ДРУГИМИ СЛОВАМИ, ИТОГОВ, ВЫВОД." },
 
             // ================= ЧАСТИЦЫ =================
-            { category: "Частицы", title: "Частицы: Указательные", content: "<strong>Слова:</strong> ВОТ, ВОН, ЭТО" },
-            { category: "Частицы", title: "Частицы: Уточняющие", content: "<strong>Слова:</strong> ИМЕННО, КАК РАЗ, ТОЛЬКО, ЛИШЬ, ЕДИНСТВЕННО, ИСКЛЮЧИТЕЛЬНО" },
-            { category: "Частицы", title: "Частицы: Ограничительные", content: "<strong>Слова:</strong> ТОЛЬКО, ЛИШЬ" },
-            { category: "Частицы", title: "Частицы: Усилительные", content: "<strong>Слова:</strong> ДАЖЕ, ЖЕ, ВЕДЬ, ВСЁ, ВСЁ-ТАКИ, УЖ" },
-            { category: "Частицы", title: "Частицы: Выражающие сомнение", content: "<strong>Слова:</strong> ВРЯД ЛИ, ЕДВА ЛИ" },
+            { category: "Частицы", title: "Указательные", content: "<strong>Слова:</strong> ВОТ, ВОН, ЭТО" },
+            { category: "Частицы", title: "Уточняющие", content: "<strong>Слова:</strong> ИМЕННО, КАК РАЗ, ТОЛЬКО, ЛИШЬ, ЕДИНСТВЕННО, ИСКЛЮЧИТЕЛЬНО" },
+            { category: "Частицы", title: "Ограничительные", content: "<strong>Слова:</strong> ТОЛЬКО, ЛИШЬ" },
+            { category: "Частицы", title: "Усилительные", content: "<strong>Слова:</strong> ДАЖЕ, ЖЕ, ВЕДЬ, ВСЁ, ВСЁ-ТАКИ, УЖ" },
+            { category: "Частицы", title: "Выражающие сомнение", content: "<strong>Слова:</strong> ВРЯД ЛИ, ЕДВА ЛИ" },
 
             // ================= МЕСТОИМЕНИЯ =================
-            { category: "Местоимения", title: "Разряды: Личные", content: "<strong>Слова:</strong> Я, МЫ, ТЫ, ВЫ, ОН, ОНА, ОНО, ОНИ" },
-            { category: "Местоимения", title: "Разряды: Возвратное", content: "<strong>Слова:</strong> СЕБЯ" },
-            { category: "Местоимения", title: "Разряды: Притяжательные", content: "<strong>Слова:</strong> МОЙ, НАШ, ТВОЙ, ВАШ, ЕГО, ЕЁ, ИХ, СВОЙ" },
-            { category: "Местоимения", title: "Разряды: Указательные", content: "<strong>Слова:</strong> ТОТ, ЭТОТ, ТАКОЙ, ТАКОВ, ТА, ТЕ, ЭТИ..." },
-            { category: "Местоимения", title: "Разряды: Вопросительные (с.сл.)", content: "<strong>Слова:</strong> КТО, ЧТО, КАКОЙ, ЧЕЙ, СКОЛЬКО, КОТОРЫЙ" },
-            { category: "Местоимения", title: "Разряды: Относительные", content: "<strong>Слова:</strong> КТО, ЧТО, КАКОЙ, ЧЕЙ, СКОЛЬКО, КОТОРЫЙ<br><br><i>(Те же слова, что и вопросительные, но служат для связи частей сложного предложения)</i>" },
-            { category: "Местоимения", title: "Разряды: Неопределенные", content: "<strong>Слова:</strong> НЕКТО, КАКОЙ-ТО, ЧЕЙ-ЛИБО, ЧТО-НИБУДЬ..." },
-            { category: "Местоимения", title: "Разряды: Отрицательные", content: "<strong>Слова:</strong> НИКТО, НИЧТО, НИКАКОЙ, НЕКОГО, НЕЧЕГО, НИСКОЛЬКО..." },
-            { category: "Местоимения", title: "Разряды: Определительные", content: "<strong>Слова:</strong> ВЕСЬ, ВСЯКИЙ, САМ, САМЫЙ, КАЖДЫЙ, ИНОЙ, ЛЮБОЙ, ДРУГОЙ" },
+            { category: "Местоимения", title: "Личные", content: "<strong>Слова:</strong> Я, МЫ, ТЫ, ВЫ, ОН, ОНА, ОНО, ОНИ" },
+            { category: "Местоимения", title: "Возвратное", content: "<strong>Слова:</strong> СЕБЯ" },
+            { category: "Местоимения", title: "Притяжательные", content: "<strong>Слова:</strong> МОЙ, НАШ, ТВОЙ, ВАШ, ЕГО, ЕЁ, ИХ, СВОЙ" },
+            { category: "Местоимения", title: "Указательные", content: "<strong>Слова:</strong> ТОТ, ЭТОТ, ТАКОЙ, ТАКОВ, ТА, ТЕ, ЭТИ..." },
+            { category: "Местоимения", title: "Вопросительные", content: "<strong>Слова:</strong> КТО, ЧТО, КАКОЙ, ЧЕЙ, СКОЛЬКО, КОТОРЫЙ" },
+            { category: "Местоимения", title: "Относительные (союзные слова)", content: "<strong>Слова:</strong> КТО, ЧТО, КАКОЙ, ЧЕЙ, СКОЛЬКО, КОТОРЫЙ<br><br><i>(Те же слова, что и вопросительные, но служат для связи частей сложного предложения)</i>" },
+            { category: "Местоимения", title: "Неопределенные", content: "<strong>Слова:</strong> НЕКТО, КАКОЙ-ТО, ЧЕЙ-ЛИБО, ЧТО-НИБУДЬ..." },
+            { category: "Местоимения", title: "Отрицательные", content: "<strong>Слова:</strong> НИКТО, НИЧТО, НИКАКОЙ, НЕКОГО, НЕЧЕГО, НИСКОЛЬКО..." },
+            { category: "Местоимения", title: "Определительные", content: "<strong>Слова:</strong> ВЕСЬ, ВСЯКИЙ, САМ, САМЫЙ, КАЖДЫЙ, ИНОЙ, ЛЮБОЙ, ДРУГОЙ" },
 
             // ================= НАРЕЧИЯ =================
-            { category: "Наречия", title: "Наречия: Порядок, время", content: "<strong>Слова:</strong> СНАЧАЛА, ДАЛЕЕ, ПОТОМ..." },
-            { category: "Наречия", title: "Наречия: Ссылка на примеры", content: "<strong>Слова:</strong> НЕСЛУЧАЙНО" },
-            { category: "Наречия", title: "Наречия: Следствие, вывод", content: "<strong>Слова:</strong> ПОЭТОМУ" },
-            { category: "Наречия", title: "Наречия: Степени", content: "<strong>Слова:</strong> ПОЧТИ, ПРИМЕРНО, НАСТОЛЬКО, СТОЛЬ" },
-            { category: "Наречия", title: "Наречия: Указательные", content: "<strong>Слова:</strong> ТАМ, ТУТ, ЗДЕСЬ, ТАК" },
-            { category: "Наречия", title: "Наречия: Относительные (союзные слова)", content: "<strong>Слова:</strong> ГДЕ, КУДА, КОГДА, ОТКУДА, ПОЧЕМУ, ЗАЧЕМ, КАК" },
-            { category: "Наречия", title: "Местоименные наречия: Указательные", content: "<strong>Слова:</strong> ЗДЕСЬ, ТАМ, ТУТ, ТУДА, ТАК, ОТТУДА, ПОЭТОМУ" },
-            { category: "Наречия", title: "Местоименные наречия: Вопросительные", content: "<strong>Слова:</strong> ГДЕ? КУДА? КОГДА? ОТКУДА? ПОЧЕМУ? ЗАЧЕМ? КАК? ОТЧЕГО?" },
-            { category: "Наречия", title: "Местоименные наречия: Относительные", content: "<strong>Слова:</strong> ГДЕ, КУДА, КОГДА, ОТКУДА, ПОЧЕМУ, ЗАЧЕМ, КАК, ОТЧЕГО" },
-            { category: "Наречия", title: "Местоименные наречия: Неопределенные", content: "<strong>Слова:</strong> ГДЕ-ТО, КУДА-ТО, КАК-НИБУДЬ, КОЕ-ГДЕ, КУДА-ЛИБО, КОЕ-КАК..." },
-            { category: "Наречия", title: "Местоименные наречия: Отрицательные", content: "<strong>Слова:</strong> НИГДЕ, НИКУДА, НИКОГДА, НЕГДЕ, НЕКУДА, НЕЗАЧЕМ, НИКАК..." },
-            { category: "Наречия", title: "Местоименные наречия: Определительные", content: "<strong>Слова:</strong> ВЕЗДЕ, ВСЮДУ, ОТОВСЮДУ, ВСЕГДА, ВСЯЧЕСКИ, ИНОГДА..." }
+            { category: "Наречия", title: "Порядок, время", content: "<strong>Слова:</strong> СНАЧАЛА, ДАЛЕЕ, ПОТОМ..." },
+            { category: "Наречия", title: "Ссылка на примеры", content: "<strong>Слова:</strong> НЕСЛУЧАЙНО" },
+            { category: "Наречия", title: "Следствие, вывод", content: "<strong>Слова:</strong> ПОЭТОМУ" },
+            { category: "Наречия", title: "Степени", content: "<strong>Слова:</strong> ПОЧТИ, ПРИМЕРНО, НАСТОЛЬКО, СТОЛЬ" },
+            { category: "Наречия", title: "Указательные", content: "<strong>Слова:</strong> ТАМ, ТУТ, ЗДЕСЬ, ТАК" },
+            { category: "Наречия", title: "Относительные (союзные слова)", content: "<strong>Слова:</strong> ГДЕ, КУДА, КОГДА, ОТКУДА, ПОЧЕМУ, ЗАЧЕМ, КАК" },
+            { category: "Наречия", title: "Местоименные: Указательные", content: "<strong>Слова:</strong> ЗДЕСЬ, ТАМ, ТУТ, ТУДА, ТАК, ОТТУДА, ПОЭТОМУ" },
+            { category: "Наречия", title: "Местоименные: Вопросительные", content: "<strong>Слова:</strong> ГДЕ? КУДА? КОГДА? ОТКУДА? ПОЧЕМУ? ЗАЧЕМ? КАК? ОТЧЕГО?" },
+            { category: "Наречия", title: "Местоименные: Относительные", content: "<strong>Слова:</strong> ГДЕ, КУДА, КОГДА, ОТКУДА, ПОЧЕМУ, ЗАЧЕМ, КАК, ОТЧЕГО" },
+            { category: "Наречия", title: "Местоименные: Неопределенные", content: "<strong>Слова:</strong> ГДЕ-ТО, КУДА-ТО, КАК-НИБУДЬ, КОЕ-ГДЕ, КУДА-ЛИБО, КОЕ-КАК..." },
+            { category: "Наречия", title: "Местоименные: Отрицательные", content: "<strong>Слова:</strong> НИГДЕ, НИКУДА, НИКОГДА, НЕГДЕ, НЕКУДА, НЕЗАЧЕМ, НИКАК..." },
+            { category: "Наречия", title: "Местоименные: Определительные", content: "<strong>Слова:</strong> ВЕЗДЕ, ВСЮДУ, ОТОВСЮДУ, ВСЕГДА, ВСЯЧЕСКИ, ИНОГДА..." }
         ];
 
+        // --- ЛОГИКА ТЕМЫ ---
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        updateThemeButton(currentTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+            let theme = document.documentElement.getAttribute('data-theme');
+            let newTheme = theme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeButton(newTheme);
+        });
+
+        function updateThemeButton(theme) {
+            themeToggleBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // --- ЛОГИКА КАРТОЧЕК ---
         const container = document.getElementById('cards-container');
         const randomContainer = document.getElementById('random-container');
         const randomCardDiv = document.getElementById('single-random-card');
@@ -314,6 +411,22 @@
                 : cardsData.filter(card => card.category === currentFilter);
         }
 
+        // Шаблон карточки (вынесен отдельно для чистоты кода)
+        function createCardHTML(cardData) {
+            return `
+                <div class="card-inner">
+                    <div class="card-front">
+                        <div class="card-badge">${cardData.category}</div>
+                        <div class="card-title">${cardData.title}</div>
+                        <div class="card-hint">Нажмите, чтобы перевернуть</div>
+                    </div>
+                    <div class="card-back">
+                        <div>${cardData.content}</div>
+                    </div>
+                </div>
+            `;
+        }
+
         function renderGrid() {
             container.innerHTML = '';
             const filteredData = getFilteredCards();
@@ -321,17 +434,7 @@
             filteredData.forEach(card => {
                 const cardElement = document.createElement('div');
                 cardElement.className = 'card';
-                cardElement.innerHTML = `
-                    <div class="card-inner">
-                        <div class="card-front">
-                            <div class="card-title">${card.title}</div>
-                            <div class="card-hint">Нажмите, чтобы перевернуть</div>
-                        </div>
-                        <div class="card-back">
-                            <div>${card.content}</div>
-                        </div>
-                    </div>
-                `;
+                cardElement.innerHTML = createCardHTML(card);
                 
                 cardElement.addEventListener('click', () => {
                     cardElement.classList.toggle('is-flipped');
@@ -349,17 +452,7 @@
             const cardData = filteredData[randomIndex];
 
             randomCardDiv.className = 'card fade-in';
-            randomCardDiv.innerHTML = `
-                <div class="card-inner">
-                    <div class="card-front">
-                        <div class="card-title">${cardData.title}</div>
-                        <div class="card-hint">Нажмите, чтобы перевернуть</div>
-                    </div>
-                    <div class="card-back">
-                        <div>${cardData.content}</div>
-                    </div>
-                </div>
-            `;
+            randomCardDiv.innerHTML = createCardHTML(cardData);
 
             randomCardDiv.onclick = function() {
                 this.classList.toggle('is-flipped');
@@ -389,13 +482,13 @@
 
             if (isRandomMode) {
                 toggleRandomBtn.classList.add('active');
-                toggleRandomBtn.textContent = "📚 Вернуться к сетке";
+                toggleRandomBtn.textContent = "📚 К сетке";
                 container.style.display = 'none';
                 randomContainer.style.display = 'flex';
                 renderRandomCard();
             } else {
                 toggleRandomBtn.classList.remove('active');
-                toggleRandomBtn.textContent = "🎲 Случайная карточка";
+                toggleRandomBtn.textContent = "🎲 Случайная";
                 container.style.display = 'grid';
                 randomContainer.style.display = 'none';
                 renderGrid();
